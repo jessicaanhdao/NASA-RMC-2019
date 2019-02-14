@@ -29,18 +29,18 @@ class PhysicsEngine(object):
         # Change these parameters to fit your robot!
         bumper_width = 3.25 * units.inch
 
-        self.drivetrain = drivetrains.TwoMotorDrivetrain()
+        #self.drivetrain = drivetrains.TwoMotorDrivetrain()
         
-        '''self.drivetrain = tankmodel.TankModel.theory(
+        self.drivetrain = tankmodel.TankModel.theory(
             motor_cfgs.MOTOR_CFG_CIM,           # motor configuration
-            130 * units.lbs,                    # robot mass
-            75,                              # drivetrain gear ratio
-            1,                                  # motors per side
-            0 * units.inch,                    # robot wheelbase
-            28 * units.inch + bumper_width * 2, # robot width
-            40.15 * units.inch + bumper_width * 2, # robot length
+            110 * units.lbs,                    # robot mass
+            10.71,                              # drivetrain gear ratio
+            2,                                  # motors per side
+            22 * units.inch,                    # robot wheelbase
+            23 * units.inch + bumper_width * 2, # robot width
+            32 * units.inch + bumper_width * 2, # robot length
             6 * units.inch,                     # wheel diameter
-        )'''
+        )
 
         # Precompute the encoder constant
         # -> encoder counts per revolution / wheel circumference
@@ -80,14 +80,14 @@ class PhysicsEngine(object):
         r_motor = hal_data["CAN"][2]["value"]
         # rr_motor = hal_data['pwm'][0]['value']
 
-        #x, y, angle = self.drivetrain.get_distance(lf_motor, rf_motor, tm_diff)
+        x, y, angle = self.drivetrain.get_distance(l_motor, r_motor, tm_diff)
+        self.physics_controller.distance_drive(x, y, angle)
+        
+        ##speed, rotation = self.drivetrain.get_vector(l_motor, r_motor)
+        #self.physics_controller.drive(speed, rotation, tm_diff)
+        
+        #x, y, angle = self.physics_controller.get_position()
         #self.physics_controller.distance_drive(x, y, angle)
-        
-        speed, rotation = self.drivetrain.get_vector(l_motor, r_motor)
-        self.physics_controller.drive(speed, rotation, tm_diff)
-        
-        x, y, angle = self.physics_controller.get_position()
-
         # Update encoders
         '''self.l_distance += self.drivetrain.l_velocity * tm_diff
         self.r_distance += self.drivetrain.r_velocity * tm_diff

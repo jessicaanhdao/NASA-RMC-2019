@@ -8,9 +8,7 @@ import navx
 class Drive:
     ldrive_motor = ctre.WPI_TalonSRX
     rdrive_motor = ctre.WPI_TalonSRX
-    #tankdrive = wpilib.drive.DifferentialDrive
     arcadedrive = wpilib.drive.DifferentialDrive
-    #navX = navx.AHRS
     sd = NetworkTables
     ''' self.kP = 0.03
     self.kI = 0.00
@@ -20,17 +18,14 @@ class Drive:
     self.kToleranceDegrees = 2.0
     turnController = wpilib.PIDController'''
 
-    # speed is tunable via NetworkTables
-   # shoot_speed = tunable(1.0)
-
     def __init__(self):
         self.enabled = False
         self.sd = NetworkTables.getTable('/SmartDashboard')
         if wpilib.RobotBase.isSimulation():
             # These PID parameters are used in simulation
-            self.kP = 0.10
+            self.kP = 0.05
             self.kI = 0.010
-            self.kD = 0.020
+            self.kD = 0.010
             self.kF = 0.00
             print("Is simulation")
         else:    
@@ -49,15 +44,15 @@ class Drive:
         self.goalFound = self.sd.getAutoUpdateValue('ObjectFound',False)
        # self.navxYaw = self.sd.getAutoUpdateValue('Yaw',0)
 
-        self.turnController = wpilib.PIDController(
+        turnController = wpilib.PIDController(
             self.kP, self.kI, self.kD, self.kF, self.navX, output=self
         )
-        self.turnController.setInputRange(-180.0, 180.0)
-        self.turnController.setOutputRange(-0.2, 0.2)
-        self.turnController.setAbsoluteTolerance(self.kToleranceDegrees)
-        self.turnController.setContinuous(True)
+        turnController.setInputRange(-180.0, 180.0)
+        turnController.setOutputRange(-0.5, 0.5)
+        turnController.setAbsoluteTolerance(self.kToleranceDegrees)
+        turnController.setContinuous(False)
 
-        #self.turnController = turnController
+        self.turnController = turnController
         self.rotateToAngleRate = 0
          # Add the PID Controller to the Test-mode dashboard, allowing manual  */
         # tuning of the Turn Controller's P, I and D coefficients.            */
@@ -88,7 +83,7 @@ class Drive:
 
     def drive_forward(self,y,squaredInputs=False):
         #if(self.goalFound.value):
-            self.navX.reset()
+           # self.navX.reset()
             self.y = max(min(-y, 1), -1)
             self.turnController.setSetpoint(0)
             self.turnController.enable()
@@ -100,7 +95,8 @@ class Drive:
         #    self.rotationRate = 0
 
     def rotate(self,angle):
-        self.navX.reset()
+       # self.navX.reset()
+        #self.y = 0
         self.turnController.setSetpoint(angle)
         self.targetAngle = angle
         self.turnController.enable()
@@ -119,14 +115,17 @@ class Drive:
         '''This gets called at the end of the control loop''' 
         
         self.arcadedrive.arcadeDrive(self.y,self.rotationRate,self.squaredInputs)
-        #if (self.navX.getAngle() == self.targetAngle - self.kToleranceDegrees):
-        #    self.arcadedrive.stopMotor()
+        
         print("NavX Gyro: ", self.navX.getYaw(), self.navX.getAngle())
-      #  wpilib.Timer.delay(0.05)
+        if (self.navX.getAngle() <= self.targetAngle - self.kToleranceDegrees):
+            print("hit angle!")
+            self.arcadedrive.arcadeDrive(0,0,False)
+        wpilib.Timer.delay(0.005)
 
         # by default, the robot shouldn't move
-        self.y = 0
-        self.rotationRate = 0
+        #self.y = 0
+        #self.rotationRate = 0
+        
         
     def update_sd(self):
         self.sd.putValue('Drive/NavX | Yaw', self.navX.getYaw())
