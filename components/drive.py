@@ -23,10 +23,10 @@ class Drive:
         self.sd = NetworkTables.getTable('/SmartDashboard')
         if wpilib.RobotBase.isSimulation():
             # These PID parameters are used in simulation
-            self.kP = 0.05
-            self.kI = 0.00
-            self.kD = 0.00
-            self.kF = 0.00
+            self.kP = 0.025
+            self.kI = 0.000
+            self.kD = 0.0100
+            self.kF = 0.10
             print("Is simulation")
         else:    
             self.kP = 0.04
@@ -98,7 +98,7 @@ class Drive:
     def rotate(self,angle):
        # self.navX.reset()
         #self.y = 0
-        self.turnController.setSetpoint(angle)
+        self.turnController.setSetpoint(-angle)
         self.targetAngle = angle
         self.turnController.enable()
         #self.rotationRate = self.rotateToAngleRate
@@ -118,10 +118,7 @@ class Drive:
         self.arcadedrive.arcadeDrive(self.y,self.rotationRate,self.squaredInputs)
         
         print("NavX Gyro: ", self.navX.getYaw(), self.navX.getAngle())
-        #if (abs(self.targetAngle - self.navX.getAngle()) <= self.kToleranceDegrees):
-         #   print("hit angle!")
-            #self.arcadedrive.stopMotor()
-        wpilib.Timer.delay(0.05)
+        wpilib.Timer.delay(0.005)
 
         # by default, the robot shouldn't move
         #self.y = 0
