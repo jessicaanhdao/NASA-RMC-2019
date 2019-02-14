@@ -1,0 +1,11 @@
+diff a/.deploy_cfg b/.deploy_cfg	(rejected hunks)
+@@ -2,3 +3,9 @@
++<<<<<<< HEAD
+ [auth]
+ hostname = 190
+ 
++=======
++[auth]
++hostname = 190
++
++>>>>>>> remotes/origin/master
