@@ -24,8 +24,8 @@ class Drive:
         if wpilib.RobotBase.isSimulation():
             # These PID parameters are used in simulation
             self.kP = 0.05
-            self.kI = 0.010
-            self.kD = 0.010
+            self.kI = 0.00
+            self.kD = 0.00
             self.kF = 0.00
             print("Is simulation")
         else:    
@@ -38,6 +38,7 @@ class Drive:
         self.kToleranceDegrees = 2.0
 
         self.navX = navx.AHRS.create_spi()
+        self.navX.reset()
         self.y = 0
         self.rotationRate = 0
         self.squaredInputs = False
@@ -48,7 +49,7 @@ class Drive:
             self.kP, self.kI, self.kD, self.kF, self.navX, output=self
         )
         turnController.setInputRange(-180.0, 180.0)
-        turnController.setOutputRange(-0.5, 0.5)
+        turnController.setOutputRange(-0.7, 0.7)
         turnController.setAbsoluteTolerance(self.kToleranceDegrees)
         turnController.setContinuous(False)
 
@@ -117,15 +118,15 @@ class Drive:
         self.arcadedrive.arcadeDrive(self.y,self.rotationRate,self.squaredInputs)
         
         print("NavX Gyro: ", self.navX.getYaw(), self.navX.getAngle())
-        if (self.navX.getAngle() <= self.targetAngle - self.kToleranceDegrees):
-            print("hit angle!")
-            self.arcadedrive.arcadeDrive(0,0,False)
-        wpilib.Timer.delay(0.005)
+        #if (abs(self.targetAngle - self.navX.getAngle()) <= self.kToleranceDegrees):
+         #   print("hit angle!")
+            #self.arcadedrive.stopMotor()
+        wpilib.Timer.delay(0.05)
 
         # by default, the robot shouldn't move
         #self.y = 0
         #self.rotationRate = 0
-        
+
         
     def update_sd(self):
         self.sd.putValue('Drive/NavX | Yaw', self.navX.getYaw())

@@ -43,7 +43,7 @@ class DriveForward(AutonomousStateMachine):
 
     @state()
     def rotate_90(self):
-        if (self.drive.rotate(90)):
+        if(self.drive.rotate(-90)):
             self.next_state('drive_stop')
 
     @timed_state(duration=1)
