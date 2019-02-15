@@ -19,7 +19,7 @@ class DriveForward(AutonomousStateMachine):
     def drive_wait(self):
         pass
 
-    @timed_state(first=True,duration=1, next_state='drive_backwards')
+    @timed_state(first=True,duration=3, next_state='drive_backwards')
     def drive_forward(self):
        #self.drive.return_gyro_angle
        self.drive.drive_forward(1)
@@ -43,10 +43,10 @@ class DriveForward(AutonomousStateMachine):
 
     @state()
     def rotate_90(self):
-        self.drive.rotate(90)
-#            self.next_state('drive_stop')
+        if(self.drive.rotate(-90)):
+            self.next_state('drive_stop')
 
-    @timed_state(duration=1)
+    @timed_state(duration=2)
     def drive_stop(self):
        self.drive.drive_forward(1)
 

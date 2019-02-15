@@ -29,21 +29,6 @@ class myRobot(magicbot.MagicRobot):
     #: report to DS if action fails.
     kTimeoutMs = 10
 
-    ''' if wpilib.RobotBase.isSimulation():
-        # These PID parameters are used in simulation
-        kP = 0.02
-        kI = 0.00
-        kD = 0.00
-        kF = 0.00
-    else:
-        # These PID parameters are used on a real robot
-        kP = 0.03
-        kI = 0.00
-        kD = 0.00
-        kF = 0.00
-
-    kToleranceDegrees = 2.0'''
-
     def createObjects(self):
         """ Set motors """
         self.ldrive_motor = ctre.WPI_TalonSRX(1)
@@ -118,18 +103,6 @@ class myRobot(magicbot.MagicRobot):
         self.ldrive_motor.setSelectedSensorPosition(0, self.kPIDLoopIdx, self.kTimeoutMs)
         self.rdrive_motor.setSelectedSensorPosition(0, self.kPIDLoopIdx, self.kTimeoutMs)
 
-         # set acceleration and vcruise velocity - see documentation
-        self.ldrive_motor.configMotionCruiseVelocity(15000, self.kTimeoutMs)
-        self.ldrive_motor.configMotionAcceleration(6000, self.kTimeoutMs)
-
-        self.rdrive_motor.configMotionCruiseVelocity(15000, self.kTimeoutMs)
-        self.rdrive_motor.configMotionAcceleration(6000, self.kTimeoutMs)
-
-        '''self.ldrive_motor.clearMotionProfileHasUnderrun()
-        self.ldrive_motor.changeMotionControlFramePeriod(25)
-        self.ldrive_mpstatus = MotionProfileStatus()'''
-
-        #self.tankdrive = wpilib.drive.DifferentialDrive(self.ldrive_motor,self.rdrive_motor)
         self.arcadedrive = wpilib.drive.DifferentialDrive(self.ldrive_motor,self.rdrive_motor)
         self.stick = wpilib.XboxController(1)
         self.timer = wpilib.Timer()

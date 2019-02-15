@@ -6,36 +6,33 @@ import navx
 #from wpilib import drive
 
 class Drive:
+    ENCODER_ROTATION = 1023
+    WHEEL_DIAMETER = 7.639
+    
     ldrive_motor = ctre.WPI_TalonSRX
     rdrive_motor = ctre.WPI_TalonSRX
     arcadedrive = wpilib.drive.DifferentialDrive
     sd = NetworkTables
-    ''' self.kP = 0.03
-    self.kI = 0.00
-    self.kD = 0.00
-    self.kF = 0.00
-
-    self.kToleranceDegrees = 2.0
-    turnController = wpilib.PIDController'''
+    
 
     def __init__(self):
         self.enabled = False
         self.sd = NetworkTables.getTable('/SmartDashboard')
         if wpilib.RobotBase.isSimulation():
             # These PID parameters are used in simulation
-            self.kP = 0.025
-            self.kI = 0.000
-            self.kD = 0.0100
-            self.kF = 0.10
+            self.kP = 0.5
+            self.kI = 0.01
+            self.kD = 2.0
+            self.kF = 0.0
             print("Is simulation")
         else:    
             self.kP = 0.04
-            self.kI = 0.001
+            self.kI = 0.01
             self.kD = 0.020
             self.kF = 0.00
             print("Is not simulation")
 
-        self.kToleranceDegrees = 2.0
+        self.kToleranceDegrees = 4.0
 
         self.navX = navx.AHRS.create_spi()
         self.navX.reset()
@@ -49,11 +46,12 @@ class Drive:
             self.kP, self.kI, self.kD, self.kF, self.navX, output=self
         )
         turnController.setInputRange(-180.0, 180.0)
-        turnController.setOutputRange(-0.7, 0.7)
+        turnController.setOutputRange(-0.15, 0.15)
         turnController.setAbsoluteTolerance(self.kToleranceDegrees)
-        turnController.setContinuous(False)
+        turnController.setContinuous(True)
 
         self.turnController = turnController
+        self.turnController.reset()
         self.rotateToAngleRate = 0
          # Add the PID Controller to the Test-mode dashboard, allowing manual  */
         # tuning of the Turn Controller's P, I and D coefficients.            */
@@ -88,21 +86,25 @@ class Drive:
             self.y = max(min(-y, 1), -1)
             self.turnController.setSetpoint(0)
             self.turnController.enable()
-            return True
+            
             #self.rotationRate = 0
 
         #else:
         #    self.y = 0
         #    self.rotationRate = 0
-
+    def gyro_drive(self):
+        if (abs(self.targetAngle - self.navX.getAngle()) <= self.kToleranceDegrees):
+            return True
+        return False
     def rotate(self,angle):
        # self.navX.reset()
-        #self.y = 0
+        self.y = 0
+        
         self.turnController.setSetpoint(-angle)
         self.targetAngle = angle
         self.turnController.enable()
-        #self.rotationRate = self.rotateToAngleRate
         print("rotationRate: ",self.rotationRate)
+        return self.gyro_drive()
      #   self.rotationRate = angle
         
     def pidWrite(self, output):

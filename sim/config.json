@@ -8,8 +8,8 @@
         "starting_angle": 0
       },
       "field": {
-        "w": 25,
-        "h": 27,
+        "w": 50,
+        "h": 57,
         "px_per_ft": 10,
         
         "objects": [
