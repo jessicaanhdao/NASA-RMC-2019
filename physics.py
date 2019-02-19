@@ -13,6 +13,7 @@ class PhysicsEngine(object):
         Alternatively, you can inherit from this object. However, that is
         not required.
     """
+    target = ntproperty("/camera/target", (0.0, float("inf"), 0.0))
 
     def __init__(self, physics_controller):
         """
@@ -24,7 +25,6 @@ class PhysicsEngine(object):
         self.physics_controller = physics_controller
         self.position = 0
 
-        #self.physics_controller.add_device_gyro_channel("navxmxp_i2c_1_angle")
         self.physics_controller.add_device_gyro_channel("navxmxp_spi_4_angle")
         # Change these parameters to fit your robot!
         bumper_width = 3.25 * units.inch
@@ -48,7 +48,18 @@ class PhysicsEngine(object):
         
         self.l_distance = 0
         self.r_distance = 0
-        
+        targets = [
+            # right
+            VisionSim.Target(15, 13, 250, 0),
+            # middle
+            VisionSim.Target(16.5, 15.5, 295, 65),
+            # left
+            VisionSim.Target(15, 18, 0, 110),
+            VisionSim.Target(10, 25, 0, 110),
+        ]
+        self.vision = VisionSim(
+            targets, 61.0, 1.5,20, 15, physics_controller=physics_controller
+        )
 
 
     def initialize(self, hal_data):
@@ -83,6 +94,11 @@ class PhysicsEngine(object):
         x, y, angle = self.drivetrain.get_distance(l_motor, r_motor, tm_diff)
         self.physics_controller.distance_drive(x, y, angle)
         
+        data = self.vision.compute(now, x, y, angle)
+        if data is not None:
+            self.target = data[0][:4]
+            print("data: ",data)
+            print("target: ",self.target)
         ##speed, rotation = self.drivetrain.get_vector(l_motor, r_motor)
         #self.physics_controller.drive(speed, rotation, tm_diff)
         

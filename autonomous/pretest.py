@@ -7,7 +7,7 @@ from components.dump import Dump
 
 class DriveForward(AutonomousStateMachine):
     MODE_NAME = 'Full Behaviors'
-    DEFAULT = True
+    DEFAULT = False
 
     # Injected from the definition in robot.py
     drive: Drive
@@ -44,11 +44,11 @@ class DriveForward(AutonomousStateMachine):
     @state()
     def rotate_90(self):
         if(self.drive.rotate(-90)):
-            self.next_state('drive_stop')
+            self.next_state('stop')
 
     @timed_state(duration=2)
-    def drive_stop(self):
-       self.drive.drive_forward(1)
+    def stop(self):
+       self.drive.stop()
 
     @timed_state(duration=5)
     def drive_90_left(self):

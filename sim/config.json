@@ -3,7 +3,7 @@
       "robot": {
         "w": 2,
         "h": 3,
-        "starting_x": 2,
+        "starting_x": 10,
         "starting_y": 20,
         "starting_angle": 0
       },
@@ -19,6 +19,23 @@
           { "color": "grey",
             "points": [ [16.83, 0], [19.90, 0], [19.90, 15.75], [16.83, 15.75] ] }
         ]
+      },
+      "joysticks": {
+        "0": {
+          "axes": {
+            "X": "Strafe",
+            "Y": "Back/Forth",
+            "Z": "Rotate"
+          },
+        
+          "buttons": {
+            "1": "Reset",
+            "2": "Goto 0",
+            "3": "Goto 90",
+            "4": "Goto 180",
+            "5": "Goto -90"
+          }
+        }
       }
     }
   }

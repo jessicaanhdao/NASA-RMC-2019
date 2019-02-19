@@ -20,9 +20,9 @@ class Drive:
         self.sd = NetworkTables.getTable('/SmartDashboard')
         if wpilib.RobotBase.isSimulation():
             # These PID parameters are used in simulation
-            self.kP = 0.5
-            self.kI = 0.01
-            self.kD = 2.0
+            self.kP = 0.05
+            self.kI = 0.1001
+            self.kD = 0.10
             self.kF = 0.0
             print("Is simulation")
         else:    
@@ -32,7 +32,7 @@ class Drive:
             self.kF = 0.00
             print("Is not simulation")
 
-        self.kToleranceDegrees = 4.0
+        self.kToleranceDegrees = 0.0
 
         self.navX = navx.AHRS.create_spi()
         self.navX.reset()
@@ -46,7 +46,7 @@ class Drive:
             self.kP, self.kI, self.kD, self.kF, self.navX, output=self
         )
         turnController.setInputRange(-180.0, 180.0)
-        turnController.setOutputRange(-0.15, 0.15)
+        turnController.setOutputRange(-0.1, 0.1)
         turnController.setAbsoluteTolerance(self.kToleranceDegrees)
         turnController.setContinuous(True)
 
@@ -82,7 +82,7 @@ class Drive:
 
     def drive_forward(self,y,squaredInputs=False):
         #if(self.goalFound.value):
-           # self.navX.reset()
+            #self.navX.reset()
             self.y = max(min(-y, 1), -1)
             self.turnController.setSetpoint(0)
             self.turnController.enable()
@@ -96,6 +96,7 @@ class Drive:
         if (abs(self.targetAngle - self.navX.getAngle()) <= self.kToleranceDegrees):
             return True
         return False
+
     def rotate(self,angle):
        # self.navX.reset()
         self.y = 0
@@ -104,9 +105,20 @@ class Drive:
         self.targetAngle = angle
         self.turnController.enable()
         print("rotationRate: ",self.rotationRate)
-        return self.gyro_drive()
-     #   self.rotationRate = angle
-        
+        #return self.gyro_drive()
+
+    def isDoneRotation(self):
+        if (abs(self.targetAngle - self.navX.getAngle()) <= self.kToleranceDegrees):
+            return True
+        return False
+
+    def stop(self):
+        self.y=0
+        self.rotationRate=0
+
+    def isGoalFound(self):
+        return self.goalFound.value
+
     def pidWrite(self, output):
         """This function is invoked periodically by the PID Controller,
         based upon navX MXP yaw angle input and PID Coefficients.
@@ -119,7 +131,7 @@ class Drive:
         
         self.arcadedrive.arcadeDrive(self.y,self.rotationRate,self.squaredInputs)
         
-        print("NavX Gyro: ", self.navX.getYaw(), self.navX.getAngle())
+        #print("NavX Gyro: ", self.navX.getYaw(), self.navX.getAngle())
         wpilib.Timer.delay(0.005)
 
         # by default, the robot shouldn't move

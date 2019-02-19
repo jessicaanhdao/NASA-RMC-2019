@@ -7,6 +7,8 @@ from components.drive import Drive
 from components.scoop import Scoop
 from components.depth import Depth
 from components.dump import Dump
+from components.camera import Camera
+
 import navx
 from networktables import NetworkTables
 
@@ -15,6 +17,7 @@ class myRobot(magicbot.MagicRobot):
     scoop : Scoop
     depth: Depth
     dump : Dump
+    camera : Camera
 
     #: Which PID slot to pull gains from. Starting 2018, you can choose from
     #: 0,1,2 or 3. Only the first two (0,1) are visible in web-based
@@ -28,6 +31,14 @@ class myRobot(magicbot.MagicRobot):
     #: set to zero to skip waiting for confirmation, set to nonzero to wait and
     #: report to DS if action fails.
     kTimeoutMs = 10
+
+    #ahrs = navx.AHRS.create_spi()
+    currentRotationRate = 0
+    kP = 0.05
+    kI = 0.1001
+    kD = 0.10
+    kF = 0.0
+    kToleranceDegrees = 0.0
 
     def createObjects(self):
         """ Set motors """
@@ -119,14 +130,26 @@ class myRobot(magicbot.MagicRobot):
        # Initialize SmartDashboard, the table of robot values
         self.sd = NetworkTables.getTable('vision') 
 
-       
+        
+        ''' turnnController = wpilib.PIDController(
+            self.kP, self.kI, self.kD, self.kF, self.ahrs, output=self
+        )
+        turnnController.setInputRange(-180.0, 180.0)
+        turnnController.setOutputRange(-0.1, 0.1)
+        turnnController.setAbsoluteTolerance(self.kToleranceDegrees)
+        turnnController.setContinuous(True)
+
+        self.turnController = turnnController
+        self.turnController.reset()'''
 
     def teleopPeriodic(self):
-        #self.drive.tankDrive(1,1)
-        #self.drive.tankDrive(self.stick.getY(hand=wpilib.XboxController.Hand.kLeft), self.stick.getY(), False)
-        #self.ldrive_motor.set(ctre.WPI_TalonSRX.ControlMode.PercentOutput, self.stick.getY()/10)
-#       self.rdrive_motor.set(ctre.WPI_TalonSRX.ControlMode.PercentOutput, self.stick.getX())
-        
+        self.timer.start()
+        #print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
+        self.drive.drive_forward(self.stick.getY())
+        print("y stick: ",self.stick.getY())
+        self.drive.rotate(self.stick.getX())
+        #self.timer.delay(0.005)
+
         '''   def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
         self.timer.reset()

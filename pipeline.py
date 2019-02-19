@@ -155,8 +155,3 @@ class Pipeline:
         return detector.detect(input)
 
 
-<<<<<<< HEAD
-
-=======
-
->>>>>>> remotes/origin/master
