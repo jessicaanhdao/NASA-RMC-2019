@@ -3,6 +3,7 @@ import numpy as np
 import cv2
 from pipeline import Pipeline
 from grip import GripPipeline
+from arucotag import ArucoTag
 
 from networktables import NetworkTables
 import logging
@@ -19,8 +20,8 @@ def main():
     
     cs = CameraServer.getInstance()
     cs.enableLogging()
- #   pip = Pipeline()
     grip = GripPipeline()
+    arucotag = ArucoTag()
     '''usb1 = cs.startAutomaticCapture(dev=0)
     usb2 = cs.startAutomaticCapture(dev=1)'''
   #  image_file = cv2.imread('pig.jpg',1)
@@ -52,9 +53,7 @@ def main():
 
     # Allocating new images is very expensive, always try to preallocate
     img = np.zeros(shape=(240, 320, 3), dtype=np.uint8)
-    img_flip = np.zeros(shape=(240, 320, 3), dtype=np.uint8)
-    pig = np.zeros(shape=(240, 320, 3), dtype=np.uint8)
-
+    
     while True:
         
         # Tell the CvSink to grab a frame from the camera and put it
@@ -70,21 +69,17 @@ def main():
         #
         # Insert your image processing logic here!
         #       
-#        pip.process(img)
         grip.process(img)
-  #      print("blobs length: ",len(pip.find_blobs_output))
-        print("blobs length: ",len(grip.filter_contours_output))
+        #img = arucotag.process(img)
 
-      #  print(pip.find_blobs_output.size())
-        if (len(grip.filter_contours_output) > 0):
+        '''if (len(grip.filter_contours_output) > 0):
             sd.putBoolean('ObjectFound', True)
         else:
-            sd.putBoolean('ObjectFound', False)
+            sd.putBoolean('ObjectFound', False)'''
       #  img_with_keypoints = cv2.drawKeypoints(pip.mask_output, pip.find_blobs_output,pig,(0, 0, 255))
         cv2.drawContours(img,grip.filter_contours_output,-1,(0,255,0),1)
 
-        #cv2.flip(img, flipCode=0, dst=img_flip)
-
+        
 
         # (optional) send some image back to the dashboard
         outputStream.putFrame(img)

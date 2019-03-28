@@ -8,6 +8,7 @@ from components.scoop import Scoop
 from components.depth import Depth
 from components.dump import Dump
 from components.camera import Camera
+from components.cameraservo import CameraServo
 
 import navx
 from networktables import NetworkTables
@@ -18,6 +19,7 @@ class myRobot(magicbot.MagicRobot):
     depth: Depth
     dump : Dump
     camera : Camera
+    servo: CameraServo
 
     #: Which PID slot to pull gains from. Starting 2018, you can choose from
     #: 0,1,2 or 3. Only the first two (0,1) are visible in web-based
@@ -69,11 +71,22 @@ class myRobot(magicbot.MagicRobot):
         self.ldrive_motor.setSensorPhase(True)
         self.rdrive_motor.setSensorPhase(True)
 
+        # pick CW versus CCW when motor controller is positive/green
+        self.ldrive_motor.setInverted(True)
+        self.rdrive_motor.setInverted(False)
+            
+        if wpilib.RobotBase.isSimulation():
+            print("sim")
+            #self.ldrive_motor.setInverted(True)
+            #self.rdrive_motor.setInverted(False)
+            #_talon0.setInverted(false); // pick CW versus CCW when motor controller is positive/green
+
+
 
         # choose based on what direction you want forward/positive to be.
         # This does not affect sensor phase.
-        self.ldrive_motor.setInverted(False)
-        self.rdrive_motor.setInverted(False)
+        #self.ldrive_motor.setInverted(False)
+        #self.rdrive_motor.setInverted(False)
 
         # Set relevant frame periods to be at least as fast as periodic rate
         self.ldrive_motor.setStatusFramePeriod(ctre.WPI_TalonSRX.StatusFrameEnhanced.Status_13_Base_PIDF0, 10, self.kTimeoutMs)
@@ -81,7 +94,7 @@ class myRobot(magicbot.MagicRobot):
         self.rdrive_motor.setStatusFramePeriod(ctre.WPI_TalonSRX.StatusFrameEnhanced.Status_13_Base_PIDF0, 10, self.kTimeoutMs)
         self.rdrive_motor.setStatusFramePeriod(ctre.WPI_TalonSRX.StatusFrameEnhanced.Status_10_MotionMagic, 10, self.kTimeoutMs)
         # set the peak and nominal outputs, 12V means full
-        self.ldrive_motor.configNominalOutputForward(0, self.kTimeoutMs)
+        '''self.ldrive_motor.configNominalOutputForward(0, self.kTimeoutMs)
         self.ldrive_motor.configNominalOutputReverse(0, self.kTimeoutMs)
         self.ldrive_motor.configPeakOutputForward(1, self.kTimeoutMs)
         self.ldrive_motor.configPeakOutputReverse(-1, self.kTimeoutMs)
@@ -89,7 +102,7 @@ class myRobot(magicbot.MagicRobot):
         self.rdrive_motor.configNominalOutputForward(0, self.kTimeoutMs)
         self.rdrive_motor.configNominalOutputReverse(0, self.kTimeoutMs)
         self.rdrive_motor.configPeakOutputForward(1, self.kTimeoutMs)
-        self.rdrive_motor.configPeakOutputReverse(-1, self.kTimeoutMs)
+        self.rdrive_motor.configPeakOutputReverse(-1, self.kTimeoutMs)'''
 
         # Set the allowable closed-loop error, Closed-Loop output will be
         # neutral within this range. See Table in Section 17.2.1 for native
@@ -125,7 +138,7 @@ class myRobot(magicbot.MagicRobot):
 
         
         
-        wpilib.CameraServer.launch('vision.py:main')
+        #wpilib.CameraServer.launch('vision.py:main')
 
        # Initialize SmartDashboard, the table of robot values
         self.sd = NetworkTables.getTable('vision') 
@@ -146,7 +159,7 @@ class myRobot(magicbot.MagicRobot):
         self.timer.start()
         #print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
         self.drive.drive_forward(self.stick.getY())
-        print("y stick: ",self.stick.getY())
+        # print("y stick: ",self.stick.getY())
         self.drive.rotate(self.stick.getX())
         #self.timer.delay(0.005)
 

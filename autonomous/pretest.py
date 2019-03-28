@@ -24,7 +24,7 @@ class DriveForward(AutonomousStateMachine):
        #self.drive.return_gyro_angle
        self.drive.drive_forward(1)
        
-    @timed_state(duration=1, next_state='rotate_90')
+    @timed_state(duration=1)
     def drive_backwards(self):
        #self.drive.return_gyro_angle
        self.drive.drive_forward(-1)
