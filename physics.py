@@ -90,10 +90,10 @@ class PhysicsEngine(object):
         # Simulate the drivetrain
         l_motor = hal_data["CAN"][1]
         r_motor = hal_data["CAN"][2]
-        print(l_motor['value'], r_motor['value'])
+        #print(l_motor['value'], r_motor['value'])
        
         x, y, angle = self.drivetrain.get_distance(l_motor["value"], r_motor["value"], tm_diff)
-        print(x, y, angle)
+        #print(x, y, angle)
         self.physics_controller.distance_drive(x, y, angle)
         
         data = self.vision.compute(now, x, y, 0)
@@ -108,16 +108,9 @@ class PhysicsEngine(object):
         # -> must be an integer
         l_speed = int(4096 * l_motor["value"] * tm_diff)
         r_speed = int(4096 * r_motor["value"] * tm_diff)
-        #l_motor["quad_position"] += l_speed
-        #r_motor["quad_position"] += r_speed
-
-        ##speed, rotation = self.drivetrain.get_vector(l_motor, r_motor)
-        #self.physics_controller.drive(speed, rotation, tm_diff)
         
         # Update encoders
         self.l_distance += self.drivetrain.l_velocity * tm_diff
         self.r_distance += self.drivetrain.r_velocity * tm_diff
-        l_motor["count"] =  int(self.l_distance * self.kEncoder)
-        r_motor["count"] = int(self.r_distance * self.kEncoder)
-        #hal_data['encoder'][1]['count'] = int(self.l_distance * self.kEncoder)
-        #hal_data['encoder'][2]['count'] = int(self.r_distance * self.kEncoder)
+        l_motor["quad_position"] =  int(self.l_distance * self.kEncoder)
+        r_motor["quad_position"] = int(self.r_distance * self.kEncoder)

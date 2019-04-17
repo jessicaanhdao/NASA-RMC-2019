@@ -1,7 +1,6 @@
 from magicbot import AutonomousStateMachine, tunable, timed_state, state
 # this is one of your components
 from components.drive import Drive
-from components.camera import Camera
 from components.cameraservo import CameraServo
 class Localize(AutonomousStateMachine):
     MODE_NAME = 'Localize'
@@ -21,5 +20,5 @@ class Localize(AutonomousStateMachine):
 
     @timed_state(duration=3)
     def drive_forward(self):
-       self.drive.drive_forward(1)
+       self.drive.drive(1)
        

@@ -5,10 +5,10 @@ import ctre
 from wpilib import drive
 from components.drive import Drive
 from components.scoop import Scoop
-from components.depth import Depth
+from components.extender import Extender
 from components.dump import Dump
-from components.camera import Camera
 from components.cameraservo import CameraServo
+from components.bumpswitch import BumpSwitch
 
 import navx
 from networktables import NetworkTables
@@ -16,10 +16,10 @@ from networktables import NetworkTables
 class myRobot(magicbot.MagicRobot):
     drive : Drive
     scoop : Scoop
-    depth: Depth
+    extender: Extender
     dump : Dump
-    camera : Camera
     servo: CameraServo
+    bumpswitch : BumpSwitch
 
     #: Which PID slot to pull gains from. Starting 2018, you can choose from
     #: 0,1,2 or 3. Only the first two (0,1) are visible in web-based
@@ -43,12 +43,17 @@ class myRobot(magicbot.MagicRobot):
     kToleranceDegrees = 0.0
 
     def createObjects(self):
+        self.robot = self
         """ Set motors """
         self.ldrive_motor = ctre.WPI_TalonSRX(1)
         self.rdrive_motor = ctre.WPI_TalonSRX(2)
         self.scoop_motor = ctre.WPI_TalonSRX(3)
-        self.depth_motor = ctre.WPI_TalonSRX(4)
+        self.extender_motor = ctre.WPI_TalonSRX(4)
         self.dump_motor = ctre.WPI_TalonSRX(5)
+    
+        """ bump switch """
+        self.left_bump = wpilib.DigitalInput(0)
+        self.right_bump = wpilib.DigitalInput(1)
         
         """ Set encoders """
         self.ldrive_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.CTRE_MagEncoder_Relative,
@@ -60,20 +65,27 @@ class myRobot(magicbot.MagicRobot):
         self.scoop_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.CTRE_MagEncoder_Relative,
             self.kPIDLoopIdx,
             self.kTimeoutMs)
-        self.depth_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.CTRE_MagEncoder_Relative,
+        '''self.extender_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.CTRE_MagEncoder_Relative,
             self.kPIDLoopIdx,
             self.kTimeoutMs)
         self.dump_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.CTRE_MagEncoder_Relative,
             self.kPIDLoopIdx,
-            self.kTimeoutMs)
+            self.kTimeoutMs)'''
 
+        '''left is forward, green light when drive forward, right is reverse'''
+        ''' likely to be, left = true, right = false. true = pos encoder when moving forward'''
         # choose to ensure sensor is positive when output is positive
-        self.ldrive_motor.setSensorPhase(True)
-        self.rdrive_motor.setSensorPhase(True)
+        #self.ldrive_motor.setSensorPhase(True)
+        #self.rdrive_motor.setSensorPhase(False)
+
 
         # pick CW versus CCW when motor controller is positive/green
-        self.ldrive_motor.setInverted(True)
-        self.rdrive_motor.setInverted(False)
+        #self.ldrive_motor.setInverted(False)
+        #self.rdrive_motor.setInverted(True)
+
+        self.extender_motor.setInverted(True)
+        self.scoop_motor.setInverted(True)
+        self.dump_motor.setInverted(True)
             
         if wpilib.RobotBase.isSimulation():
             print("sim")
@@ -83,10 +95,6 @@ class myRobot(magicbot.MagicRobot):
 
 
 
-        # choose based on what direction you want forward/positive to be.
-        # This does not affect sensor phase.
-        #self.ldrive_motor.setInverted(False)
-        #self.rdrive_motor.setInverted(False)
 
         # Set relevant frame periods to be at least as fast as periodic rate
         self.ldrive_motor.setStatusFramePeriod(ctre.WPI_TalonSRX.StatusFrameEnhanced.Status_13_Base_PIDF0, 10, self.kTimeoutMs)
@@ -109,6 +117,7 @@ class myRobot(magicbot.MagicRobot):
         # units per rotation.
         self.ldrive_motor.configAllowableClosedloopError(0, self.kPIDLoopIdx, self.kTimeoutMs)
         self.rdrive_motor.configAllowableClosedloopError(0, self.kPIDLoopIdx, self.kTimeoutMs)
+        self.extender_motor.configAllowableClosedloopError(0, self.kPIDLoopIdx, self.kTimeoutMs)
 
         # set closed loop gains in slot0, typically kF stays zero - see documentation */
         self.ldrive_motor.selectProfileSlot(self.kSlotIdx, self.kPIDLoopIdx)
@@ -123,9 +132,17 @@ class myRobot(magicbot.MagicRobot):
         self.rdrive_motor.config_kI(0, 0, self.kTimeoutMs)
         self.rdrive_motor.config_kD(0, 0, self.kTimeoutMs)
 
+        self.extender_motor.selectProfileSlot(self.kSlotIdx, self.kPIDLoopIdx)
+        self.extender_motor.config_kF(0, 0, self.kTimeoutMs)
+        self.extender_motor.config_kP(0, 0.1, self.kTimeoutMs)
+        self.extender_motor.config_kI(0, 0, self.kTimeoutMs)
+        self.extender_motor.config_kD(0, 0, self.kTimeoutMs)
+
         # zero the sensor
         self.ldrive_motor.setSelectedSensorPosition(0, self.kPIDLoopIdx, self.kTimeoutMs)
         self.rdrive_motor.setSelectedSensorPosition(0, self.kPIDLoopIdx, self.kTimeoutMs)
+        self.extender_motor.setSelectedSensorPosition(0, self.kPIDLoopIdx, self.kTimeoutMs)
+
 
         self.arcadedrive = wpilib.drive.DifferentialDrive(self.ldrive_motor,self.rdrive_motor)
         self.stick = wpilib.XboxController(1)
@@ -141,7 +158,7 @@ class myRobot(magicbot.MagicRobot):
         #wpilib.CameraServer.launch('vision.py:main')
 
        # Initialize SmartDashboard, the table of robot values
-        self.sd = NetworkTables.getTable('vision') 
+        #self.sd = NetworkTables.getTable('vision') 
 
         
         ''' turnnController = wpilib.PIDController(
@@ -158,10 +175,22 @@ class myRobot(magicbot.MagicRobot):
     def teleopPeriodic(self):
         self.timer.start()
         #print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
-        self.drive.drive_forward(self.stick.getY())
-        # print("y stick: ",self.stick.getY())
-        self.drive.rotate(self.stick.getX())
-        #self.timer.delay(0.005)
+        if (not self.stick.getRawButton(1) and not self.stick.getRawButton(2) and not self.stick.getRawButton(3)  ):
+            self.drive.run(self.stick.getY(),self.stick.getX())
+        #print("drive: ",self.stick.getY(), self.stick.getX() )
+        '''kA = 1
+        kB = 2
+        kX = 3
+        kY = 4'''
+        if (self.stick.getRawButton(1) ):
+            self.extender.run(self.stick.getY())
+        if ( self.stick.getRawButton(2)  ):
+            self.scoop.run(self.stick.getY())
+        if (self.stick.getRawButton(3)):
+            self.dump.run(self.stick.getY())
+            
+
+        
 
         '''   def autonomousInit(self):
         """This function is run once each time the robot enters autonomous mode."""
@@ -186,7 +215,7 @@ class myRobot(magicbot.MagicRobot):
         self.ldrive_motor.disable()
         self.rdrive_motor.disable()
         self.scoop_motor.disable()
-        self.depth_motor.disable()
+        self.extender_motor.disable()
         self.dump_motor.disable()
 
 if __name__ == '__main__':

@@ -9,14 +9,14 @@ class myRobot(wpilib.TimedRobot):
         self.ldrive_motor = ctre.WPI_TalonSRX(1)
         self.rdrive_motor = ctre.WPI_TalonSRX(2)
         self.scoop_motor = ctre.WPI_TalonSRX(3)
-        self.depth_motor = ctre.WPI_TalonSRX(4)
+        self.extender_motor = ctre.WPI_TalonSRX(4)
         self.dump_motor = ctre.WPI_TalonSRX(5)
         
         """ Set encoders """
         self.ldrive_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.QuadEncoder)
         self.rdrive_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.QuadEncoder)
         self.scoop_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.QuadEncoder)
-        self.depth_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.QuadEncoder)
+        self.extender_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.QuadEncoder)
         self.dump_motor.configSelectedFeedbackSensor(ctre.WPI_TalonSRX.FeedbackDevice.QuadEncoder)
 
         self.drive = wpilib.drive.DifferentialDrive(self.ldrive_motor,self.rdrive_motor)
@@ -59,7 +59,7 @@ class myRobot(wpilib.TimedRobot):
         self.ldrive_motor.disable()
         self.rdrive_motor.disable()
         self.scoop_motor.disable()
-        self.depth_motor.disable()
+        self.extender_motor.disable()
         self.dump_motor.disable()
 
 if __name__ == '__main__':
