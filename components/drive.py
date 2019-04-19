@@ -14,11 +14,13 @@ WHEEL_CIRCUMFERENCE = 2.31
 WHEEL_DIAMETER = 0.08 #meter
 GEAR_RATIO = 75
     
+#NetworkTables.initialize(server=ip)
+
 class Drive:    
     ldrive_motor : ctre.WPI_TalonSRX
     rdrive_motor : ctre.WPI_TalonSRX
     arcadedrive : wpilib.drive.DifferentialDrive
-    #sd = NetworkTables
+    sd = NetworkTables
     #target = ntproperty("/camera/target", (0.0, float("inf"), 0.0))
     #: Talon SRX/ Victor SPX will supported multiple (cascaded) PID loops. For
     #: now we just want the primary one.
@@ -29,6 +31,7 @@ class Drive:
     kTimeoutMs = 10
     def __init__(self):
         self.enabled = False
+        NetworkTables.initialize(server='roborio-190-frc.local')
         self.sd = NetworkTables.getTable('/SmartDashboard')
         if wpilib.RobotBase.isSimulation():
             # These PID parameters are used in simulation

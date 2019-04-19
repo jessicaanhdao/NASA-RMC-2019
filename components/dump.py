@@ -9,6 +9,7 @@ class Dump:
 
     def __init__(self):
         self.enabled = False
+        NetworkTables.initialize(server='roborio-190-frc.local')
         self.sd = NetworkTables.getTable('/SmartDashboard')
         self.isReadToDump = self.sd.getAutoUpdateValue("IsReadToDump",False)
         self.power = 0

@@ -3,7 +3,7 @@ from magicbot import AutonomousStateMachine, tunable, timed_state, state
 from components.scoop import Scoop
 class Localize(AutonomousStateMachine):
     MODE_NAME = 'Write CSV'
-    DEFAULT = True
+    DEFAULT = False
 
     # Injected from the definition in robot.py
     scoop: Scoop

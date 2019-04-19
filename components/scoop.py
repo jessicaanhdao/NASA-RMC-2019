@@ -21,6 +21,7 @@ class Scoop:
         #self.file.close() 
         
         self.power = 0
+        NetworkTables.initialize(server='roborio-190-frc.local')
         self.sd = NetworkTables.getTable('/SmartDashboard')
         self.timer = wpilib.Timer()
         self.timer.start()

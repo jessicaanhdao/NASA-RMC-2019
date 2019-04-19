@@ -157,8 +157,8 @@ class myRobot(magicbot.MagicRobot):
         
         #wpilib.CameraServer.launch('vision.py:main')
 
-       # Initialize SmartDashboard, the table of robot values
-        #self.sd = NetworkTables.getTable('vision') 
+        '''Initialize SmartDashboard, the table of robot values'''
+        self.sd = NetworkTables.getTable('SmartDashboard') 
 
         
         ''' turnnController = wpilib.PIDController(
@@ -176,7 +176,7 @@ class myRobot(magicbot.MagicRobot):
         self.timer.start()
         #print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
         if (not self.stick.getRawButton(1) and not self.stick.getRawButton(2) and not self.stick.getRawButton(3)  ):
-            self.drive.run(self.stick.getY(),self.stick.getX())
+            self.drive.run(self.stick.getY(hand=wpilib.XboxController.Hand.kLeft), self.stick.getY())
         #print("drive: ",self.stick.getY(), self.stick.getX() )
         '''kA = 1
         kB = 2

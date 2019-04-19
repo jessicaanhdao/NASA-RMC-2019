@@ -65,6 +65,7 @@ class DriveForward(AutonomousStateMachine):
             self.TIME_DRIVE = self.DRIVE_END - self.DRIVE_START
             self.drive.stop()
             self.next_state='digging'
+
     @state()
     def extending_digger(self):
         self.extender.extend_distance(0.1)
@@ -73,7 +74,7 @@ class DriveForward(AutonomousStateMachine):
             self.next_state = 'digging'
 
 
-    #TODO fix the timing, fix power'''
+    #TODO fix power'''
     @state()
     def digging(self):
        self.scoop.scoop_down(1)

@@ -9,16 +9,11 @@ class Localize(AutonomousStateMachine):
     # Injected from the definition in robot.py
     drive: Drive
     servo : CameraServo
-    @state(first = True)
-    def testServo(self):
+
+    @timed_state(duration = 2, first = True, next_state='findGoal')
+    def reset(self):
         self.servo.reset()
+    @state
+    def findGoal(self):
+        #self.servo.reset()
         self.servo.findGoal()
-
-    @timed_state(duration=2)
-    def stop(self):
-       self.drive.stop()
-
-    @timed_state(duration=3)
-    def drive_forward(self):
-       self.drive.drive(1)
-       

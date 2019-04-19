@@ -14,6 +14,7 @@ class Extender:
     def __init__(self):
         self.enabled = False
         self.power = 0
+        NetworkTables.initialize(server='roborio-190-frc.local')
         self.sd = NetworkTables.getTable('/SmartDashboard')
         self.timer = wpilib.Timer()
         self.canExtend = self.sd.getAutoUpdateValue('CanExtend',True)
