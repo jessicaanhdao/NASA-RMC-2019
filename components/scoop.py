@@ -93,8 +93,11 @@ class Scoop:
     def execute(self):
         '''This gets called at the end of the control loop'''
         self.scoop_motor.set(ctre.WPI_TalonSRX.ControlMode.PercentOutput,self.power)
+        
+        
+        
         self.update_sd()
-        #self.file.close() 
+        
 
     def update_sd(self):
         self.sd.putValue('Scoop/Current', self.scoop_motor.getOutputCurrent())

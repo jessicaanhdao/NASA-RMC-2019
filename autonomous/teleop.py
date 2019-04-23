@@ -3,7 +3,7 @@ import magicbot, wpilib
 
 class TeleopSandstorm:
   MODE_NAME = "Teleop"
-  DEFAULT = True
+  DEFAULT = False
   VERBOSE_LOGGING = True
   robot: magicbot.MagicRobot
 

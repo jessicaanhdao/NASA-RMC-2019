@@ -74,3 +74,9 @@ class Extender:
             self.extender_motor.set(ctre.WPI_TalonSRX.ControlMode.PercentOutput,self.power)
         
         self.enabled = False
+        self.update_sd()
+        
+
+    def update_sd(self):
+        self.sd.putValue('Extender/Encoder', self.extender_motor.getSelectedSensorPosition())
+        

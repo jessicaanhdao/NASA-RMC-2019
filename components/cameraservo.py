@@ -164,7 +164,7 @@ class CameraServo:
 
 
     def findGoal(self):       
-        #while (not self.leftCam.value and not self.rightCam.value):
+        while (not self.leftCam.value and not self.rightCam.value):
             if (self.whateverRIGHT()):
                 self.sd.putBoolean('YesTurn', True)
             else:

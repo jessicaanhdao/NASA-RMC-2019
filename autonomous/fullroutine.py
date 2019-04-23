@@ -1,6 +1,6 @@
-from magicbot import AutonomousStateMachine, tunable, timed_state, state
+from magicbot import AutonomousStateMachine, timed_state, state
 import wpilib
-# this is one of your components
+# these are your components
 from components.drive import Drive
 from components.scoop import Scoop
 from components.extender import Extender
@@ -13,7 +13,7 @@ TIME_RETRACT = 10 #10sec
 TIME_DOCK = 10 #10sec
 
 
-class DriveForward(AutonomousStateMachine):
+class FullBehaviors(AutonomousStateMachine):
     MODE_NAME = 'Full Behaviors'
     DEFAULT = False
 
@@ -48,7 +48,6 @@ class DriveForward(AutonomousStateMachine):
     @state( first = True)
     def localization(self):
         self.drive.rotate2Parallel()
-        '''if finish then reset encoder?'''
         if (self.drive.isDoneRotating()):
             self.drive.stop()
             self.servo.reset()
@@ -103,7 +102,6 @@ class DriveForward(AutonomousStateMachine):
     def drive_back(self):
         '''test drive backwards with encoders'''
         self.drive.drive_distance(0)
-        
         if(self.servo.isGoalInSight() or self.drive.isDistanceReached(0)):
             self.drive.stop()
             self.next_state = "turn_perpendicular"

@@ -160,34 +160,27 @@ class myRobot(magicbot.MagicRobot):
         '''Initialize SmartDashboard, the table of robot values'''
         self.sd = NetworkTables.getTable('SmartDashboard') 
 
-        
-        ''' turnnController = wpilib.PIDController(
-            self.kP, self.kI, self.kD, self.kF, self.ahrs, output=self
-        )
-        turnnController.setInputRange(-180.0, 180.0)
-        turnnController.setOutputRange(-0.1, 0.1)
-        turnnController.setAbsoluteTolerance(self.kToleranceDegrees)
-        turnnController.setContinuous(True)
 
-        self.turnController = turnnController
-        self.turnController.reset()'''
 
     def teleopPeriodic(self):
         self.timer.start()
         #print("NavX Gyro", self.ahrs.getYaw(), self.ahrs.getAngle())
         if (not self.stick.getRawButton(1) and not self.stick.getRawButton(2) and not self.stick.getRawButton(3)  ):
-            self.drive.run(self.stick.getY(hand=wpilib.XboxController.Hand.kLeft), self.stick.getY())
+            self.drive.run(-self.stick.getY(hand=wpilib.XboxController.Hand.kLeft), -self.stick.getY())
         #print("drive: ",self.stick.getY(), self.stick.getX() )
         '''kA = 1
         kB = 2
         kX = 3
-        kY = 4'''
+        kY = 4
+        A button -- run extender
+        B button -- run scoop
+        X button -- run dump'''
         if (self.stick.getRawButton(1) ):
-            self.extender.run(self.stick.getY())
+            self.extender.run(-self.stick.getY())
         if ( self.stick.getRawButton(2)  ):
-            self.scoop.run(self.stick.getY())
+            self.scoop.run(-self.stick.getY())
         if (self.stick.getRawButton(3)):
-            self.dump.run(self.stick.getY())
+            self.dump.run(-self.stick.getY())
             
 
         

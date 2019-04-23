@@ -106,7 +106,6 @@ class Drive:
     
     def return_gyro_angle(self):
         """Returns the gyro angle"""
-        self.sd.putNumber('Yaw',self.navX.getYaw())
         return self.navX.getYaw()
 
     def resetNavx(self):
@@ -118,9 +117,9 @@ class Drive:
         self.rdrive_motor.setSelectedSensorPosition(0, self.kPIDLoopIdx, self.kTimeoutMs)
 
     def drive(self,y,squaredInputs=False):
-        if (self.MoveBackwardToDig and self.digging.value != 'Nothing'):
-            self.y=0
-        else:
+        #if (self.MoveBackwardToDig and self.digging.value != 'Nothing'):
+        #    self.y=0
+        #else:
             self.positionMode = False   
             self.dockingMode = False 
             self.y = y
@@ -144,12 +143,9 @@ class Drive:
         return meters
 
     def drive_distance(self, meters):
-        #something like talon.getSelectedSensorPosition to return the position of selected sensor
         self.positionMode = True
         self.dockingMode = False
-        #self.positionMode = False
         self.target_position = self.meterToTicks(meters)
-        #print(target_position)
 
         '''print("left inverted:",self.ldrive_motor.getInverted())
         print("right inverted:",self.rdrive_motor.getInverted())
@@ -179,8 +175,7 @@ class Drive:
     def isDoneRotating(self):
         if (abs(self.targetAngle - self.navX.getAngle()) <= self.kToleranceDegrees):
             print ("---done rotating---")
-            return True
-            
+            return True 
         return False
 
     '''  self localization '''
@@ -229,8 +224,8 @@ class Drive:
 
     
     def isGoalFound(self):
-        #return self.yesTurn
-        return True
+        return self.yesTurn.value
+        #return True
 
     def pidWrite(self, output):
         """This function is invoked periodically by the PID Controller,
@@ -255,17 +250,12 @@ class Drive:
     
     def execute(self):
         '''This gets called at the end of the control loop''' 
-        #print("NavX Gyro", self.navX.getYaw(), self.navX.getAngle())
-        #print(self.turnController.getError())
         if (self.positionMode):
-            #TODO check vlaue type of ControlMode value
-            self.ldrive_motor.set(WPI_TalonSRX.ControlMode.Position,self.target_position )
-            self.rdrive_motor.set(WPI_TalonSRX.ControlMode.Position,self.target_position )
+            self.ldrive_motor.set(WPI_TalonSRX.ControlMode.Position,self.target_position)
+            self.rdrive_motor.set(WPI_TalonSRX.ControlMode.Position,self.target_position)
         elif (self.dockingMode):
-            self.ldrive_motor.set(WPI_TalonSRX.ControlMode.PercentOutput,self.leftPower )
-            print("left:",self.ldrive_motor.get())
-            self.rdrive_motor.set(WPI_TalonSRX.ControlMode.PercentOutput,self.rightPower )
-            print("right:",self.rdrive_motor.get())
+            self.ldrive_motor.set(WPI_TalonSRX.ControlMode.PercentOutput,self.leftPower)
+            self.rdrive_motor.set(WPI_TalonSRX.ControlMode.PercentOutput,self.rightPower)
         else:
             self.arcadedrive.arcadeDrive(self.y,-self.rotationRate,self.squaredInputs)
 
