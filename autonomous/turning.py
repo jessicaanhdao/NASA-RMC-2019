@@ -8,7 +8,7 @@ import wpilib
 
 class DriveForward(AutonomousStateMachine):
     MODE_NAME = 'Turning'
-    DEFAULT = True
+    DEFAULT = False
 
     # Injected from the definition in robot.py
     drive: Drive

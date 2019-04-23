@@ -182,7 +182,7 @@ class Drive:
     def rotate2Parallel(self):
         if (self.yesTurn.value):
             angle = self.rotateAngle.value
-        self.rotate(angle)
+            self.rotate(angle)
 
     ''' before docking'''
     def rotate2Perpendicular(self):

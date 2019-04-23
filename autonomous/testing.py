@@ -13,9 +13,9 @@ TIME_RETRACT = 10 #10sec
 TIME_DOCK = 10 #10sec
 
 
-class FullBehaviors(AutonomousStateMachine):
-    MODE_NAME = 'Full Behaviors'
-    DEFAULT = False
+class TestFullBehaviors(AutonomousStateMachine):
+    MODE_NAME = 'Test Full Behaviors'
+    DEFAULT = True
 
     # Injected from the definition in robot.py
     drive: Drive
@@ -38,14 +38,14 @@ class FullBehaviors(AutonomousStateMachine):
             return True
         return False
     
-    @state(first = True)
+    @state()
     def findGoal(self):
         self.timer.reset()
         self.servo.findGoal()
         if (self.drive.isGoalFound()):
             self.next_state = 'localization'
         
-    @state( )
+    @state(first=True )
     def localization(self):
         if(self.timer.get() >= 600):
             self.done()
@@ -57,7 +57,12 @@ class FullBehaviors(AutonomousStateMachine):
             self.drive.resetNavx()
             self.drive.resetEncoder()
             self.DRIVE_START = self.timer.get()
-            self.next_state('drive_to_mining')
+            self.next_state('drive_distance')
+
+    @timed_state(duration=10)
+    def drive_distance(self):
+        self.drive.drive(1)
+
 
     @state()
     def drive_to_mining(self):
@@ -134,7 +139,8 @@ class FullBehaviors(AutonomousStateMachine):
         self.dump.start_dumping()
         if(self.timer.get() >= 600):
             self.done()
-        else: 
+        else:
+            self.drive.rotate(90) 
             self.next_state = 'FindGoal'
 
 
